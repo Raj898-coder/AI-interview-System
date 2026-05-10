@@ -16,7 +16,7 @@ import PrivacyPolicy from './pages/Policy'
 import RefundPolicy from './pages/RefundPolicy'
 import Contact from './pages/Contact'
 
-export const ServerUrl  = "https://ai-interview-system-0uxu.onrender.com/"
+export const ServerUrl  = "https://ai-interview-system-0uxu.onrender.com"
 
 function App() {
 

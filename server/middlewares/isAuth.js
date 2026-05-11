@@ -1,27 +1,51 @@
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
+const isAuth = async (req, res, next) => {
+  try {
 
-const isAuth = async (req,res,next) => {
-    try {
-        let {token} = req.cookies
+    // Cookie Token
+    let token = req.cookies.token;
 
-        if(!token){
-            return res.status(400).json({message:"user does not have a token"})
-        }
-        const verifyToken = jwt.verify(token , process.env.JWT_SECRET)
-        
-        if(!verifyToken){
-            return res.status(400).json({message:"user does not have a valid token"})
-        }
-        req.userId = verifyToken.userId
-
-        next()
-   
-
-    } catch (error) {
-        return res.status(500).json({message:`isAuth error ${error}`})
+    // Authorization Header Token Support
+    if (!token && req.headers.authorization) {
+      token = req.headers.authorization.split(" ")[1];
     }
-    
-}
 
-export default isAuth
+    // No Token
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "No token found",
+      });
+    }
+
+    // Verify Token
+    const verifyToken = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    // Invalid Token
+    if (!verifyToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+
+    // Save User Id
+    req.userId = verifyToken.userId;
+
+    next();
+
+  } catch (error) {
+
+    return res.status(500).json({
+      success: false,
+      message: `Auth Middleware Error: ${error.message}`,
+    });
+
+  }
+};
+
+export default isAuth;
